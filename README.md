@@ -7,6 +7,6 @@ var dataLoader = new DataLoader(),
         endpoint : ENDPOINT,
         show : 6, // items to show
         data : {} // optional data send request
-        callback : function(){ /** run after load */ },
+        callback : foo
     });
 ```
