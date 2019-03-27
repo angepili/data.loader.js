@@ -1,9 +1,9 @@
 # data.loader.js
 
 ```javascript
-var dataLoa = new DataLoader(),
+var dataLoader = new DataLoader(),
     ENDPOINT = 'https://jsonplaceholder.typicode.com/posts';
-    runFilters.loadContent({
+    dataLoader.loadContent({
         endpoint : ENDPOINT,
         show : 6, // items to show
         data : {} // optional data send request
