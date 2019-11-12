@@ -1,8 +1,8 @@
-var DataLoader = function(obj) {
+const DataLoader = function(obj) {
        
-        var DATA = [];
+        let DATA = [];
 
-        var Options = {
+        const Options = {
             endpoint    : obj.endpoint ? obj.endpoint : '',
             params      : obj.data ? Object.keys(obj.data).map(function(key) { return key + '=' + obj.data[key]; }).join('&') : '',
             show        : obj.show ? obj.show : 10,
@@ -11,10 +11,10 @@ var DataLoader = function(obj) {
             template    : obj.template
         }
 
-        var proprieties = {
+        const Proprieties = {
             offset : 0,
             filters: {},
-            findObjectByKey: function (array, key, value) {
+            findObjectByKey: (array, key, value) => {
                 for (var i = 0; i < array.length; i++) {
                     if (array[i][key] === value) {
                         return array[i];
@@ -22,27 +22,27 @@ var DataLoader = function(obj) {
                 }
                 return null;
             },
-            setFilter: function (key, value) {
-                proprieties.filters[key] = value;
+            setFilter: (key, value) => {
+                Proprieties.filters[key] = value;
             },
-            removeFilter : function(key){
-                delete proprieties.filters[key];
+            removeFilter : key => {
+                delete Proprieties.filters[key];
             },
-            applyFilters: function (data) {
+            applyFilters:  data => {
                 if (Object.size(data) == 0) {
     
                 } else {
                     var criteria = [];
-                    for (key in proprieties.filters) {
+                    for (key in Proprieties.filters) {
                         criteria.push({
                             Field: key,
-                            Values: proprieties.filters[key]
+                            Values: Proprieties.filters[key]
                         })
                     }
-                    proprieties.result = data.flexFilter(criteria);
+                    Proprieties.result = data.flexFilter(criteria);
                 }
             },
-            cleanData: function () {
+            cleanData: () => {
                 data = [];
                 for (var i = 0; i < window.results.length; i++) {
                     if (window.results[i].id > 0) {
@@ -52,7 +52,7 @@ var DataLoader = function(obj) {
             }
         }
 
-        Object.size = function(obj) {
+        Object.size = obj => {
             var size = 0, key;
             for (key in obj) {
                 if (obj.hasOwnProperty(key)) size++;
@@ -60,13 +60,13 @@ var DataLoader = function(obj) {
             return size;
         };
 
-        function replaceMe(template, data) {
+        const BuildTemplate = (template, data) => {
             const pattern = /{\s*(\w+?)\s*}/g;
             return template.replace(pattern, (_, token) => data[token] || '');
         }
 
-        var Load = function(){
-            const { endpoint, params, show } = Options;
+        const Load = () => {
+            const { endpoint, params } = Options;
             fetch(endpoint+params)
                 .then(response => {
                     if (response.status !== 200) {
@@ -86,47 +86,41 @@ var DataLoader = function(obj) {
                 })
         }
 
-        var GetContent = ()=>{
+        const GetContent = () => {
 
-            var container = document.getElementById(Options.container);
+            const { container, template, show } = Options;
+            const ContainerElement = document.getElementById(container);
+            let total = Object.size(DATA);
+            
+                if(Proprieties.offset == 0) Proprieties.offset = show;
 
-                if(proprieties.offset == 0) proprieties.offset = Options.show;
 
-                if(!('search' in proprieties) && Object.size(proprieties.filters) == 0){
-                    tmp = DATA.slice(0,proprieties.offset);
-                    total = Object.size(DATA);
-                } else if('search' in proprieties) {
-                    if(proprieties.offset == 0) proprieties.offset = Options.show;
-                    total = Object.size(DATA);
-                    tmp = total < Options.show ? DATA : DATA.slice(0,proprieties.offset);
+                if(!('search' in Proprieties) && Object.size(Proprieties.filters) == 0){
+                    tmp = DATA.slice(0,Proprieties.offset);
+                } else if('search' in Proprieties) {
+                    tmp = total < show ? DATA : DATA.slice(0,Proprieties.offset);
                 } else {
-                    if(proprieties.offset == 0) proprieties.offset = Options.show;
-                    tmp = proprieties.result.slice(0,proprieties.offset);
-                    total = Object.size(proprieties.result);
+                    total = Object.size(Proprieties.result);
+                    tmp = Proprieties.result.slice(0,Proprieties.offset);
                 }
-
-                
-                current = proprieties.offset;
 
                 if(total == 0){
-                    container.innterHtml = '<div class="clearfix"><div class="alert alert-danger">Nessun contenuto per questa selezione di filtri</div></div>';
+                    ContainerElement.innterHtml = '<div class="clearfix"><div class="alert alert-danger">Nessun contenuto per questa selezione di filtri</div></div>';
                 }
                 
-                container.innerHTML = '';
-                for(var i = 0; i < Object.size(tmp); i++){
-                    container.innerHTML += replaceMe(Options.template,tmp[i]);
-                }
+                ContainerElement.innerHTML = '';
+                tmp.map( item => {
+                    ContainerElement.innerHTML += BuildTemplate( template, item );
+                })
 
         }
 
-        var LoadMore = function(){
-
+        const LoadMore = () => {
             document.getElementById(Options.loadMore).addEventListener('click',(e)=>{
                 e.preventDefault();
-                proprieties.offset += Options.show;
+                Proprieties.offset += Options.show;
                 GetContent();  
-            })
-
+            });
         }
 
         /**
@@ -137,7 +131,7 @@ var DataLoader = function(obj) {
             var buttons = jQuery('button[data-filter]');
             buttons.on('click',function(e){
                 e.preventDefault();
-                proprieties.offset = 0;
+                Proprieties.offset = 0;
                 var that = jQuery(this),
                     container = that.parent(),
                     key = that.data('type'),
@@ -147,21 +141,21 @@ var DataLoader = function(obj) {
 
                     container.find('button[data-type="'+key+'"]').removeClass('active');
 
-                    if('search' in proprieties){
+                    if('search' in Proprieties){
                         data = cache;
-                        delete proprieties.search;
+                        delete Proprieties.search;
                     }
 
                     if(!active){
                         that.addClass('active');
-                        proprieties.setFilter(key,value);
+                        Proprieties.setFilter(key,value);
                         if(value == '*'){
-                            proprieties.removeFilter(key);
+                            Proprieties.removeFilter(key);
                         }
                     } else {
                         that.removeClass('active');
-                        if(key in proprieties.filters){
-                            proprieties.removeFilter(key);
+                        if(key in Proprieties.filters){
+                            Proprieties.removeFilter(key);
                         }
                     }
                     
@@ -169,7 +163,7 @@ var DataLoader = function(obj) {
                         container.find('button[data-type]:eq(0)').addClass('active');
                     }
 
-                    proprieties.applyFilters(DATA);
+                    Proprieties.applyFilters(DATA);
                     GetContent();
             });
         } */
