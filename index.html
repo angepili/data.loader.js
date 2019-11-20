@@ -8,7 +8,13 @@
 </head>
 <body>
 
-
+    <div id="Filters">
+        <button data-type="userId" data-filter="*">Tutti</button>
+        <button data-type="userId" data-filter="1">User #1</button>
+        <button data-type="userId" data-filter="2">User #2</button>
+        <button data-type="userId" data-filter="3">User #3</button>
+        <button data-type="userId" data-filter="4">User #4</button>
+    </div>
     <div id="DataLoaderContent"></div>
     <button id="LoadMore">Carica altro</button>
     
@@ -17,11 +23,12 @@
     
     DataLoader({
         endpoint : 'https://jsonplaceholder.typicode.com/posts',
-        show : 10,
+        show : 9,
         template :  `
             <div class="item">
                 <h2>{id} - {title}</h2>
                 <p class="bio">{body}</p>
+                <p><em>{userId}</em></p>
             </div>
             `
     });

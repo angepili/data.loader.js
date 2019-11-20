@@ -32,22 +32,11 @@ const DataLoader = function(obj) {
                 if (Object.size(data) == 0) {
     
                 } else {
-                    var criteria = [];
-                    for (key in Proprieties.filters) {
-                        criteria.push({
-                            Field: key,
-                            Values: Proprieties.filters[key]
-                        })
-                    }
-                    Proprieties.result = data.flexFilter(criteria);
-                }
-            },
-            cleanData: () => {
-                data = [];
-                for (var i = 0; i < window.results.length; i++) {
-                    if (window.results[i].id > 0) {
-                        data.push(window.results[i]);
-                    }
+                    Proprieties.result = data.filter(function(obj) {
+                       return Object.keys(Proprieties.filters).every(function(c) {
+                         return obj[c] == Proprieties.filters[c];
+                       });
+                    });
                 }
             }
         }
@@ -70,19 +59,15 @@ const DataLoader = function(obj) {
             fetch(endpoint+params)
                 .then(response => {
                     if (response.status !== 200) {
-                      console.log('Looks like there was a problem. Status Code: ' +
-                        response.status);
-                      return;
+                        console.log(response.status);
+                        return;
                     }
-                
                     response.json().then(data => {
                         DATA = data;
                         GetContent();
                         LoadMore();
-                        // Filters();
+                        Filters();
                     });
-
-                    
                 })
         }
 
@@ -90,28 +75,33 @@ const DataLoader = function(obj) {
 
             const { container, template, show } = Options;
             const ContainerElement = document.getElementById(container);
-            let total = Object.size(DATA);
+            let total = DATA.length;
             
-                if(Proprieties.offset == 0) Proprieties.offset = show;
+            if(Proprieties.offset == 0) Proprieties.offset = show;
 
+            if(Object.size(Proprieties.filters) == 0){
+                tmp = DATA.slice(0,Proprieties.offset);
+            } else {
+                tmp = Proprieties.result.slice(0,Proprieties.offset);
+            }
 
-                if(!('search' in Proprieties) && Object.size(Proprieties.filters) == 0){
-                    tmp = DATA.slice(0,Proprieties.offset);
-                } else if('search' in Proprieties) {
-                    tmp = total < show ? DATA : DATA.slice(0,Proprieties.offset);
+            if(total == 0){
+                ContainerElement.innterHtml = '<div class="clearfix"><div class="alert alert-danger">Nessun contenuto per questa selezione di filtri</div></div>';
+            }
+
+            let totalNow = Proprieties.result ? Object.size(Proprieties.result) : total;
+                console.log(tmp.length,totalNow);
+                if(tmp.length == totalNow){
+                    document.getElementById(Options.loadMore).style.display = 'none';
                 } else {
-                    total = Object.size(Proprieties.result);
-                    tmp = Proprieties.result.slice(0,Proprieties.offset);
-                }
-
-                if(total == 0){
-                    ContainerElement.innterHtml = '<div class="clearfix"><div class="alert alert-danger">Nessun contenuto per questa selezione di filtri</div></div>';
+                    document.getElementById(Options.loadMore).style.display = 'block';
                 }
                 
-                ContainerElement.innerHTML = '';
-                tmp.map( item => {
-                    ContainerElement.innerHTML += BuildTemplate( template, item );
-                })
+            
+            ContainerElement.innerHTML = '';
+            tmp.map( item => {
+                ContainerElement.innerHTML += BuildTemplate( template, item );
+            })
 
         }
 
@@ -123,50 +113,46 @@ const DataLoader = function(obj) {
             });
         }
 
-        /**
-         * TODO: da riscrivere
-         */
-        /* 
-            var Filters = function(){
-            var buttons = jQuery('button[data-filter]');
-            buttons.on('click',function(e){
-                e.preventDefault();
-                Proprieties.offset = 0;
-                var that = jQuery(this),
-                    container = that.parent(),
-                    key = that.data('type'),
-                    value = that.data('filter').toString();
-                    active = that.hasClass('active');
-                    that.removeClass('active');
-
-                    container.find('button[data-type="'+key+'"]').removeClass('active');
-
-                    if('search' in Proprieties){
-                        data = cache;
-                        delete Proprieties.search;
-                    }
-
-                    if(!active){
-                        that.addClass('active');
-                        Proprieties.setFilter(key,value);
-                        if(value == '*'){
-                            Proprieties.removeFilter(key);
+    
+        const Filters = ()=> {
+            let buttons = document.querySelectorAll('button[data-filter]');
+                
+                for(let i = 0; i < buttons.length; i++){
+                    const that = buttons[i];
+                    that.addEventListener('click',(e)=>{
+                        e.preventDefault();
+                        let key = that.getAttribute('data-type');
+                        let value = that.getAttribute('data-filter');
+                        Proprieties.offset = 0;
+                        if(!hasClass(that,'active')){
+                            removeClass();
+                            that.classList.add('active');
+                            Proprieties.setFilter(key,value);
+                            if(value == '*'){
+                                Proprieties.removeFilter(key);
+                            }
+                        } else {
+                            that.classList.remove('active');
+                            if(key in Proprieties.filters){
+                                Proprieties.removeFilter(key);
+                            }
                         }
-                    } else {
-                        that.removeClass('active');
-                        if(key in Proprieties.filters){
-                            Proprieties.removeFilter(key);
-                        }
-                    }
-                    
-                    if(container.find('button[data-type].active').length == 0){
-                        container.find('button[data-type]:eq(0)').addClass('active');
-                    }
 
-                    Proprieties.applyFilters(DATA);
-                    GetContent();
-            });
-        } */
+                        Proprieties.applyFilters(DATA);
+                        GetContent();
+                    });
+                }
+
+                function removeClass(){
+                    for(let i = 0; i < buttons.length; i++){
+                        buttons[i].classList.remove('active');
+                    }
+                }
+
+                function hasClass(element, className) {
+                    return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
+                }
+        } 
 
 
         return Load();
