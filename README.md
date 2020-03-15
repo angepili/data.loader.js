@@ -1,5 +1,4 @@
 # data.loader.js
-<img src="https://raw.githubusercontent.com/angepili/data.loader.js/master/logo.svg" alt="logo" />
 
 ```html
     <div id="DataLoaderContent"></div>
