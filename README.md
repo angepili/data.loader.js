@@ -36,7 +36,7 @@ DEMO: https://angepili.github.io/data.loader.js/
 ```javascript
     new DataLoader({
         endpoint : 'https://jsonplaceholder.typicode.com/posts',
-        show : 6, // Set number of items to show and offset;
+        show : 6,
         template :  `
             <div class="item">
                 <h2>{id} - {title}</h2>
