@@ -62,3 +62,4 @@ typings/
 
 *.scss
 *.map
+package-lock.json

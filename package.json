@@ -1,7 +1,7 @@
 {
   "name": "data.loader",
   "version": "1.0.0",
-  "description": "```html     <div id=\"DataLoaderContent\"></div>     <button id=\"LoadMore\">Carica altro</button> ```",
+  "description": "This library are able to fetch json data from external source, show X items per times, and filter by object key.",
   "main": "webpack.config.js",
   "private": true,
   "dependencies": {
