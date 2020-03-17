@@ -1,4 +1,4 @@
-![data.loader.js](https://sendeyo.com/up/d/12f6ea3abb)<!-- .element  style="width: 300px; height: auto" -->
+![data.loader.js](https://sendeyo.com/up/d/12f6ea3abb)
 
 This library are able to fetch json data from external source, show X items per times, and filter by object key.
 
@@ -35,15 +35,15 @@ DEMO: https://angepili.github.io/data.loader.js/
 
 ```javascript
     new DataLoader({
-        endpoint : 'https://jsonplaceholder.typicode.com/posts', // Required,
-        show : 6, // Set number of items to show and offset; Optional, 6 by defaut
+        endpoint : 'https://jsonplaceholder.typicode.com/posts',
+        show : 6,
         template :  `
             <div class="item">
                 <h2>{id} - {title}</h2>
                 <p class="bio">{body}</p>
             </div>
-            `, // Define the TPL to iterate, Use {variable} to replace automatically obj key; required
-        container: 'DataLoaderContent', // Set ID of container; Optional, use "DataLoaderContent" by default
-        loadMore: 'LoadMore' // Set ID of button; Optional, use "LoadMore" by default
+            `, 
+        container: 'DataLoaderContent',
+        loadMore: 'LoadMore'
     });
 ```
